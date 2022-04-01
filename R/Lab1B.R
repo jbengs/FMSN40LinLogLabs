@@ -53,19 +53,6 @@ ggplot(data = loglin.dataset, aes(x = year, y = log(Pb))) +
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
 #### Plot calculations for specific prediction in the future (2014) ####
 
 x.2014 <- data.frame(year = c(2014-1975))
