@@ -22,3 +22,14 @@ b <- cbind(
   upr = exp(confint(loglin)[2,2])
 )
 (rbind(alpha,b)) 
+
+pb.2014 <- data.frame( year = c(2014-1975))
+
+pb.pred <- cbind(
+  pb.2014,
+  fit = exp(predict(loglin, pb.2014)),
+  conf = exp(predict(loglin, pb.2014,interval = "confidence")),
+  pred = exp(predict(loglin, pb.2014, interval = "prediction"))
+)
+pb.pred$conf.fit <- pb.pred$pred.fit <- NULL
+(pb.pred)
