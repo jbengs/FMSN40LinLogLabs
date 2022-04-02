@@ -77,7 +77,8 @@ e.span <- c(-e.max, e.max)
 #Residuals against Y-hat
 ggplot(data = loglin.dataset, aes(x = fit, y = e)) + geom_point() + geom_line(y = 0) + geom_smooth() +
   ylab("residuals") +
-  xlab("Y-hat")
+  xlab("Y-hat") + 
+  expand_limits(y = e.span)
 
 #Residuals Q-Q-plot
 ggplot(data = loglin.dataset, aes(sample = e)) + 
