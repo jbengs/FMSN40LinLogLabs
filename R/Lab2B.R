@@ -1,4 +1,5 @@
-# Lab2B -Add location to the model ####
+# Lab2B -Add location to the model
+# 2B(a) ####
 library("ggplot2")
 load("Data/PB_all.rda")
 temp <- Pb_all$year - 1975
@@ -12,7 +13,8 @@ ggplot(data = Pb_all, aes( x = year, y = Pb)) +
   geom_point() +
   facet_wrap(~region)
 
-#2B(b) - plot model ####
+
+# 2B(b) - plot model ####
 # Fit a linear model with y = log(Pb) and x = I(year - 1975) using all the data.
 # Does this seem like a good idea for all the regions?
 # YES it is still a good model,but region needs to be taken into account.
@@ -33,7 +35,8 @@ ggplot(data = Pb.pred , aes(x = year, y = log(Pb))) +
   
 
 
-#2.B(c). Fit a model using lm(log(Pb) ~ I(year - 1975) + region, data = Pb_all) ####
+# 2.B(c). ####
+# Fit a model using lm(log(Pb) ~ I(year - 1975) + region, data = Pb_all)
 # Which location was used as reference? Is this a good idea?
 # Answer: ÖREBRO was used as it is the first one. Not good as Örebro has the least number of observations
 (summary(Pb_all))
@@ -41,7 +44,8 @@ loglin.region <- lm(log(Pb) ~ year + region, data = Pb_all)
 (summary(loglin.region)$coefficients)
 
 
-# 2.B(d). The reference category should always be a large category. Change the region variable so ####
+# 2.B(d). ####
+# The reference category should always be a large category. Change the region variable so
 # that [mzq]= Jamtland will be used as reference instead.
 Pb_all$region <- relevel(Pb_all$region, "Jamtland")
 # Then refit the model in 2.B(c).
@@ -71,22 +75,30 @@ Jamtland.2014.pred$conf.fit <- Jamtland.2014.pred$pred.fit <- NULL
 
 # 2.B(f ). ####
 #Estimate the ratio between the expected Pb-level in Orebro and the level in Jamtland for any given year.
+#Answer: The Betaorebro-parameter
 
-
-
-
-
-
-
-Pb.region.pred <- cbind(
-  Pb_all,
-  fit = predict(loglin.region),
-  conf = predict(loglin.region, interval = "confidence"),
-  pred = predict(loglin.region, interval = "prediction")
+# 2.B(g). ####
+#Orebro does not have any observations for 1975. Use the model to estimate the expected ¨
+# Pb-level in Orebro in 1975, together with a 95 % confidence interval.
+Orebro.1975 <- data.frame(year = c(1975-1975), region = "Orebro")
+Orebro.pred.1975 <- cbind(
+  Orebro.1975,
+  fit = exp(predict(loglin.region, Orebro.1975)),
+  conf = exp(predict(loglin.region, Orebro.1975, interval = "confidence")),
+  pred = exp(predict(loglin.region, Orebro.1975, interval = "prediction"))
 )
-Pb.region.pred$conf.fit <- Pb.region.pred$pred.fit <- NULL
+Orebro.pred.1975$conf.fit <- Orebro.pred.1975$pred.fit <- NULL
+(Orebro.pred.1975)
 
-ggplot(data = Pb.region.pred , aes(x = year, y = log(Pb))) + 
-  geom_point() + 
-  facet_wrap(~region) +
-  geom_line(aes(y = fit))
+# 2.B(h). ####
+#Use the model to estimate the expected Pb-level in Orebro in the year [ ¨ mzq], together
+# with a 95 % confidence interval.
+Orebro.2014 <- data.frame(year = c(2014-1975), region = "Orebro")
+Orebro.pred.2014 <- cbind(
+  Orebro.2014,
+  fit = exp(predict(loglin.region, Orebro.2014)),
+  conf = exp(predict(loglin.region, Orebro.2014, interval = "confidence")),
+  pred = exp(predict(loglin.region, Orebro.2014, interval = "prediction"))
+)
+Orebro.pred.2014$conf.fit <- Orebro.pred.2014$pred.fit <- NULL
+(Orebro.pred.2014)
