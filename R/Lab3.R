@@ -1,4 +1,4 @@
-#Lab3A
+#Lab3 A and B
 library("ggplot2")
 load("Data/PB_all.rda")
 temp <- Pb_all$year - 1975
@@ -190,3 +190,65 @@ ggplot(data = Pb_all, aes( y = log(Pb), x = year)) +
   
   
          
+# LAB 3 B
+# 3. B(a) model building ####
+# log(Pb) ~ I(year - 1975)*region
+model.0 <- lm(log(Pb) ~ year, data = Pb_all)
+model.1 <- lm(log(Pb) ~ year + region, data = Pb_all)
+model.2 <- lm(log(Pb) ~ year*region, data = Pb_all)
+(sum.0 <- summary(model.0))
+(sum.1 <- summary(model.1))
+(sum.2 <- summary(model.2))
+anova(model.1, model.2)
+# Answer: Partial F used gives f-statistic 4.9616, with f1 = 4 and f2 = 1221. Reject H0. There are interactions.
+
+# Calculate for all three models Do the measures agree on which model is best? Worst?
+# For the model that is best according to AIC, how much of the variability in log-lead
+# concentration does is explain?
+
+# 3. B(b) calculations ####
+collect.R2s <- data.frame(
+  nr = seq(1,3),
+  model = c("0. only year", "1. year + region", "2. year * region"),
+  R2 = c(sum.0$r.squared,
+         sum.1$r.squared,
+         sum.2$r.squared),
+  R2.adj = c(sum.0$adj.r.squared,
+             sum.1$adj.r.squared,
+             sum.2$adj.r.squared)
+  )
+
+collect.AIC <- data.frame(
+  nr = seq(1,3),
+  model = c("0. Only year", "1. year + region", "2. year * region"),
+  AIC(model.0, model.1, model.2),
+  BIC(model.0, model.1, model.2)
+)
+
+# 3. B(c) Plots ####
+ggplot(collect.R2s, aes(model, R2)) +
+  geom_point(size = 3) + 
+  geom_point(aes(y = R2.adj), color = "red", size = 3) + 
+  geom_line(aes(x = nr), size = 1) +
+  geom_line(aes(x = nr, y = R2.adj), 
+            color = "red", size = 1, linetype = "dashed") +
+  geom_hline(yintercept = 1) +
+  labs(caption = "R2 (black), R2-adj (red dashed)") +
+  labs(title = "Cabbage: R2 and R2-adjusted") +
+  ylab("R2 and R2-adj") +
+  theme(text = element_text(size = 18))
+
+ggplot(collect.AIC, aes(model, AIC)) +
+  geom_point(size = 3) + 
+  geom_point(aes(y = BIC), color = "red", size = 3) + 
+  geom_line(aes(x = nr), size = 1) +
+  geom_line(aes(x = nr, y = BIC), 
+            color = "red", size = 1, linetype = "dashed") +
+  labs(caption = "AIC (black), BIC (red dashed)") +
+  labs(title = "Cabbage: AIC and BIC") +
+  ylab("AIC and BIC") +
+  theme(text = element_text(size = 18))
+# Bic says that model 1 is better than model 2
+# AIC says that model 2 is better than model 1
+# R2 and R2 adjust says that model 2 is better than model 1
+# R2 says that model 2 explains 81.3 % of the variability!
